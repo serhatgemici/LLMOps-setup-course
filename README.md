@@ -76,6 +76,9 @@ All LLM calls are tracked with:
 
 Access the MLflow UI at `http://localhost:5001`
 
+If `MLFLOW_PORT` is overridden, use that port with `localhost` or `127.0.0.1`
+to access the UI. The host-header allowlist is configured for the same port.
+
 ## Project Structure
 
 ```
