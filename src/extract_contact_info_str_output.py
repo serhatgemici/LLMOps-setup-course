@@ -49,7 +49,7 @@ def extract_contact_info(text):
         "system_prompt": system_prompt,
         "model": "openai/gpt-oss-120b",
         "temperature": 0.1,  # Low temperature for consistent data extraction
-        "max_tokens": 150,
+        "max_tokens": 500,
         "response_format": contact_schema,  # Enable structured output
     }
 
