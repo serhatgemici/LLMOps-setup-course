@@ -10,10 +10,10 @@ def extract_contact_info(text):
     url = "http://localhost:8000/generate"
 
     # Define system prompt for role specification
-    system_prompt = "Tu es un assistant spécialisé dans l'extraction précise de données. Extrais uniquement les informations demandées au format JSON spécifié."
+    system_prompt = "You are an assistant specializing in precise data extraction. Extract only the requested information in the specified JSON format."
 
     # Simplified prompt since JSON schema will enforce structure
-    prompt = f"Extrais les informations de contact (nom, email, téléphone) du texte suivant: {text}"
+    prompt = f"Extract the contact information (name, email, phone) from the following text: {text}"
 
     # Define JSON schema for structured output
     contact_schema = {
@@ -23,20 +23,20 @@ def extract_contact_info(text):
             "schema": {
                 "type": "object",
                 "properties": {
-                    "nom": {
+                    "name": {
                         "type": "string",
-                        "description": "Le nom complet de la personne",
+                        "description": "The full name of the person",
                     },
                     "email": {
                         "type": "string",
-                        "description": "L'adresse email de la personne",
+                        "description": "The email address of the person",
                     },
-                    "telephone": {
+                    "phone": {
                         "type": "string",
-                        "description": "Le numéro de téléphone de la personne",
+                        "description": "The phone number of the person",
                     },
                 },
-                "required": ["nom", "email", "telephone"],
+                "required": ["name", "email", "phone"],
                 "additionalProperties": False,
             },
             "strict": True,
@@ -47,7 +47,7 @@ def extract_contact_info(text):
     payload = {
         "prompt": prompt,
         "system_prompt": system_prompt,
-        "model": "groq-qwen-primary",
+        "model": "openai/gpt-oss-120b",
         "temperature": 0.1,  # Low temperature for consistent data extraction
         "max_tokens": 150,
         "response_format": contact_schema,  # Enable structured output
@@ -71,12 +71,12 @@ def extract_contact_info(text):
 
 if __name__ == "__main__":
     # Test with example text
-    test_text = "Contactez notre chef de projet Marc Dubois au 06-12-34-56-78 ou marc.dubois@entreprise.com"
+    test_text = "Contact our project manager Marc Dubois at 06-12-34-56-78 or marc.dubois@company.com"
     result = extract_contact_info(test_text)
 
-    print("Texte d'entrée:", test_text)
-    print("\nRésultat de l'extraction:")
+    print("Input text:", test_text)
+    print("\nExtraction result:")
     print(json.dumps(result, indent=2))
 
     # Expected output:
-    # {"nom": "Marc Dubois", "email": "marc.dubois@entreprise.com", "telephone": "06-12-34-56-78"}
+    # {"name": "Marc Dubois", "email": "marc.dubois@company.com", "phone": "06-12-34-56-78"}
