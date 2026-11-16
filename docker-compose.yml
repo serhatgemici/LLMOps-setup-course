@@ -13,8 +13,15 @@ services:
       - ./scripts:/app/scripts
     networks:
       - llmops-network
-    command: ["uv", "run", "--no-sync", "python", "/app/scripts/init_mlflow_experiments.py"]
-    restart: "no"  # Run once and exit
+    command:
+      [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "/app/scripts/init_mlflow_experiments.py",
+      ]
+    restart: "no" # Run once and exit
 
   # FastAPI application
   api:
@@ -39,10 +46,27 @@ services:
     working_dir: /app
     networks:
       - llmops-network
-    command: ["uv", "run", "--no-sync", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command:
+      [
+        "uv",
+        "run",
+        "--no-sync",
+        "uvicorn",
+        "src.api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+      ]
     # Health check
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -65,7 +89,7 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_EXPERIMENT_NAME=llmops-litellm-security
     volumes:
-    # OR (the one below for information): - ./litellm/litellm-config.yaml:/app/config.yaml
+      # OR (the one below for information): - ./litellm/litellm-config.yaml:/app/config.yaml
       - ./litellm/litellm-config-security.yaml:/app/config.yaml
     command: ["--config", "/app/config.yaml", "--port", "8000"]
     networks:
@@ -77,7 +101,13 @@ services:
         condition: service_completed_successfully
     # Health check
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/readiness')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/readiness')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -95,12 +125,18 @@ services:
       mlflow server 
       --host 0.0.0.0 
       --port 5000 
-      --allowed-hosts mlflow:5000,mlflow,localhost,127.0.0.1
+      --allowed-hosts mlflow:5000,mlflow,localhost,127.0.0.1,localhost:${MLFLOW_PORT:-5001},127.0.0.1:${MLFLOW_PORT:-5001}
       --backend-store-uri sqlite:///mlflow-data/mlflow.db 
       --default-artifact-root file:///mlflow-data/mlartifacts 
       --serve-artifacts
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 12
