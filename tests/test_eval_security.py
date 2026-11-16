@@ -66,7 +66,7 @@ if overview["block_rate_percent"] < 5:
     print("  ⚠️  Low block rate - check detection patterns")
 if "malicious_prompt" in attack_types:
     print(
-        f"  🛡️  {attack_types['malicious_prompt']} injections detected - patterns effective"
+        f"  🛡️  {attack_types['malicious_prompt']} injections detected - effective patterns"
     )
 if overview["requests_per_minute"] > 50:
     print("  ⚡ High load - monitor performance")
