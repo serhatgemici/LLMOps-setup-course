@@ -135,7 +135,7 @@ test-api-legit:
 	@echo "🔍 Testing legitimate API request..."
 	curl -X POST http://localhost:8000/generate \
 		-H "Content-Type: application/json" \
-		-d '{"model": "groq-qwen-primary", "prompt": "What are best practices for secure API design?", "max_tokens": 100}' \
+		-d '{"model": "groq-gpt-oss-backup", "prompt": "What are best practices for secure API design?", "max_tokens": 200, "reasoning_effort": "low"}' \
 		| jq -C '.'
 
 test-litellm-legit:
