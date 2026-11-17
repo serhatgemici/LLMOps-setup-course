@@ -5,38 +5,38 @@ model_list:
   # Primary models with security guardrails
   - model_name: groq-qwen-primary
     litellm_params:
-      model: groq/qwen/qwen3.6-27b
+      model: groq/qwen/qwen3.8-27b
       api_key: os.environ/GROQ_API_KEY
     litellm_settings:
       callbacks: ["detect_prompt_injection"]
-      
+
   # Backup Groq model with standard Groq provider
   - model_name: groq-gpt-oss-backup
     litellm_params:
       model: groq/openai/gpt-oss-20b
       api_key: os.environ/GROQ_API_KEY
-      
+
   # Fallback models
   - model_name: gpt-4o-secondary
     litellm_params:
       model: gpt-4o
       api_key: os.environ/OPENAI_API_KEY
-      
+
   - model_name: gemini-third
     litellm_params:
       model: gemini/gemini-2.0-flash-exp
       api_key: os.environ/GEMINI_API_KEY
-      
+
   - model_name: openrouter-fallback
     litellm_params:
       model: openrouter/mistralai/mistral-7b-instruct:free
       api_key: os.environ/OPENROUTER_API_KEY
-      
+
   # Embedding model pour cache sémantique (TEI avec OpenAI provider)
   - model_name: local-embed-model
     litellm_params:
       model: openai/sentence-transformers/all-MiniLM-L6-v2
-      api_key: "dummy-key"  # TEI ne nécessite pas de vraie clé
+      api_key: "dummy-key" # TEI ne nécessite pas de vraie clé
       api_base: "http://tei-embeddings:80"
 
 # Cache sémantique LiteLLM via Qdrant
@@ -48,10 +48,10 @@ litellm_settings:
     # Configuration Qdrant
     qdrant_api_base: "http://qdrant:6333"
     qdrant_api_key: ""
-    qdrant_collection_name: "litellm_semantic_cache"  # Collection séparée pour LiteLLM
+    qdrant_collection_name: "litellm_semantic_cache" # Collection séparée pour LiteLLM
     # Paramètres sémantiques
-    similarity_threshold: 0.7  # Baissé pour plus de sensibilité
-    qdrant_semantic_cache_embedding_model: local-embed-model  # Référence au model_name défini ci-dessus
+    similarity_threshold: 0.7 # Baissé pour plus de sensibilité
+    qdrant_semantic_cache_embedding_model: local-embed-model # Référence au model_name défini ci-dessus
     qdrant_quantization_config: "binary"
     ttl: 1800
     # Cache completion responses; do not recursively cache embedding calls.
@@ -67,7 +67,7 @@ prompt_injection_params:
 router_settings:
   fallbacks:
     - "groq-qwen-primary": ["groq-gpt-oss-backup"]
-    
+
 # Callback Settings
 callback_settings:
   mlflow:
