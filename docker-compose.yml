@@ -13,8 +13,15 @@ services:
       - ./scripts:/app/scripts
     networks:
       - llmops-network
-    command: ["uv", "run", "--no-sync", "python", "/app/scripts/init_mlflow_experiments.py"]
-    restart: "no"  # Run once and exit
+    command:
+      [
+        "uv",
+        "run",
+        "--no-sync",
+        "python",
+        "/app/scripts/init_mlflow_experiments.py",
+      ]
+    restart: "no" # Run once and exit
 
   # Qdrant collections initialization
   qdrant-init:
@@ -27,7 +34,7 @@ services:
     networks:
       - llmops-network
     command: ["sh", "/scripts/init-qdrant.sh"]
-    restart: "no"  # Run once and exit
+    restart: "no" # Run once and exit
 
   # FastAPI application
   api:
@@ -60,10 +67,27 @@ services:
     working_dir: /app/src/api
     networks:
       - llmops-network
-    command: ["uv", "run", "--no-sync", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    command:
+      [
+        "uv",
+        "run",
+        "--no-sync",
+        "uvicorn",
+        "main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+      ]
     # Health check
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/system/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/system/health')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -85,7 +109,13 @@ services:
       - tei_model_cache:/data
     networks:
       - llmops-network
-    command: ["--model-id", "sentence-transformers/all-MiniLM-L6-v2", "--hostname", "0.0.0.0"]
+    command:
+      [
+        "--model-id",
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "--hostname",
+        "0.0.0.0",
+      ]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
@@ -100,7 +130,7 @@ services:
       context: .
       dockerfile: ./litellm/Dockerfile
     ports:
-      - "${LITELLM_PORT:-8001}:4000"  # LiteLLM on port 4000
+      - "${LITELLM_PORT:-8001}:4000" # LiteLLM on port 4000
     environment:
       # API Keys for the different models
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -115,7 +145,7 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - MLFLOW_EXPERIMENT_NAME=llmops-litellm-security
     volumes:
-    # OR (the one below for information): - ./litellm/litellm-config.yaml:/app/config.yaml
+      # OR (the one below for information): - ./litellm/litellm-config.yaml:/app/config.yaml
       - ./litellm/litellm-config-security.yaml:/app/config.yaml
     command: ["--config", "/app/config.yaml"]
     networks:
@@ -129,7 +159,13 @@ services:
         condition: service_completed_successfully
     # Health check
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/readiness')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:4000/health/readiness')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -147,12 +183,18 @@ services:
       mlflow server 
       --host 0.0.0.0 
       --port 5000 
-      --allowed-hosts mlflow:5000,mlflow,localhost,127.0.0.1
+      --allowed-hosts mlflow:5000,mlflow,localhost,127.0.0.1,localhost:${MLFLOW_PORT:-5001},127.0.0.1:${MLFLOW_PORT:-5001}
       --backend-store-uri sqlite:///mlflow-data/mlflow.db 
       --default-artifact-root file:///mlflow-data/mlartifacts 
       --serve-artifacts
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -162,8 +204,8 @@ services:
   qdrant:
     image: qdrant/qdrant:v1.15.1
     ports:
-      - "${QDRANT_HTTP_PORT:-6333}:6333"  # Qdrant API port (includes web UI at /dashboard)
-      - "${QDRANT_GRPC_PORT:-6334}:6334"  # Qdrant gRPC port
+      - "${QDRANT_HTTP_PORT:-6333}:6333" # Qdrant API port (includes web UI at /dashboard)
+      - "${QDRANT_GRPC_PORT:-6334}:6334" # Qdrant gRPC port
     environment:
       - QDRANT__SERVICE__HTTP_PORT=6333
       - QDRANT__SERVICE__GRPC_PORT=6334
@@ -172,7 +214,13 @@ services:
     networks:
       - llmops-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/6333; printf 'GET /readyz HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3"]
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "exec 3<>/dev/tcp/localhost/6333; printf 'GET /readyz HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200 OK' <&3",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
