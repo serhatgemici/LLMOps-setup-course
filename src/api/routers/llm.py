@@ -21,6 +21,14 @@ from litellm import completion_cost
 router = APIRouter(prefix="/llm", tags=["llm"])
 logger = logging.getLogger(__name__)
 
+MODEL_PROVIDERS = {
+    "groq-qwen-primary": "groq",
+    "groq-gpt-oss-backup": "groq",
+    "gpt-4o-secondary": "openai",
+    "gemini-third": "gemini",
+    "openrouter-fallback": "openrouter",
+}
+
 # Configure OpenAI client to use LiteLLM proxy
 client = openai.OpenAI(
     base_url=f"{settings.LITELLM_URL}/v1",
@@ -101,7 +109,11 @@ async def generate_secure_prompt(
                 actual_model = (
                     response.model if hasattr(response, "model") else request.model
                 )
-                cost = completion_cost(completion_response=response, model=actual_model)
+                cost = completion_cost(
+                    completion_response=response,
+                    model=actual_model,
+                    custom_llm_provider=MODEL_PROVIDERS.get(request.model),
+                )
             except Exception as e:
                 logger.warning("Could not calculate cost for %s: %s", request.model, e)
                 # Fallback cost calculation based on token usage

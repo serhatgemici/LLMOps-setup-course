@@ -282,6 +282,12 @@ Shows what's tracked in MLflow, how to access dashboards, and quick health check
 - ✅ **Success/error rates** with detailed logs
 - 🧠 **Cache hit ratios** (exact vs semantic)
 
+Cost calculation uses the configured model alias to select the provider. Update
+`MODEL_PROVIDERS` in `src/api/routers/llm.py` when changing aliases, and revisit
+this mapping if a fallback uses a different provider. If pricing is unavailable,
+the API logs a warning and returns a rough estimate; cached responses retain their
+original cost until they expire or are cleared.
+
 **Access**: http://localhost:5001 → Experiments → `llmops-security-demo`
 
 ### 🔍 System Health Monitoring
