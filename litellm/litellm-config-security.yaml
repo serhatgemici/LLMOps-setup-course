@@ -35,6 +35,8 @@ model_list:
 
   # Embedding model pour cache sémantique (TEI avec OpenAI provider)
   - model_name: local-embed-model
+    model_info:
+      mode: embedding
     litellm_params:
       model: openai/sentence-transformers/all-MiniLM-L6-v2
       api_key: "dummy-key" # TEI ne nécessite pas de vraie clé
